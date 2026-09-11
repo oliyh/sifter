@@ -81,9 +81,11 @@ Download the matching version:
   or CurseForge (search "Fabric API").
 - Drop the downloaded `.jar` into your Windows mods folder (see below).
 
-### c) Our mod (every time we rebuild)
+### c) Our mod (automatic — see §5)
 
-Copy `build/libs/sifter-0.1.0.jar` into the same mods folder.
+Every `./gradlew build` now copies the freshly built jar straight into
+the Windows mods folder for you, via the shared-folder mount. No manual
+copy step.
 
 **Windows mods folder location:**
 
@@ -96,52 +98,33 @@ Copy `build/libs/sifter-0.1.0.jar` into the same mods folder.
 folder if it doesn't exist yet, the vanilla launcher creates it the first
 time you launch a Fabric profile.)
 
-## 5. Getting the jar from this VM onto Windows
+## 5. Getting the jar from this VM onto Windows — set up once
 
-You mentioned you might mount the Windows mods folder inside the VM —
-that's the smoothest option. Here's how, using VMware's shared folders:
+Done: `/mnt/hgfs/mods` is mounted (via VMware shared folders) and points
+at the Windows mods folder
+(`C:\Users\<you>\AppData\Roaming\.minecraft\mods`).
 
-### One-time setup
+`build.gradle` has a `copyToMinecraft` task, wired to run automatically
+at the end of every `./gradlew build`, that copies the built jar straight
+to `/mnt/hgfs/mods/`. Verified working — `fabric-api-0.116.17+1.21.1.jar`
+is already sitting there from the Fabric API step above, and a test
+build correctly dropped `sifter-0.1.0.jar` alongside it.
 
-1. In your VMware app (Workstation/Fusion/Player), with the VM **shut
-   down or paused**: open **VM Settings → Options → Shared Folders**.
-2. Enable shared folders, "Always enabled".
-3. Add a folder: point it at
-   `C:\Users\<you>\AppData\Roaming\.minecraft\mods` on Windows, name it
-   something like `mcmods`.
-4. Start the VM. Shared folders show up under `/mnt/hgfs/`. Check:
-
-   ```bash
-   ls /mnt/hgfs/
-   ```
-
-   You should see `mcmods`. (Right now `/mnt/hgfs` exists but is empty —
-   that's expected until you add a shared folder in the VM settings above.)
-
-   If `/mnt/hgfs` doesn't appear at all even after adding the shared
-   folder, VMware Tools' shared-folder support may not be running:
-
-   ```bash
-   sudo apt install open-vm-tools-desktop
-   sudo vmhgfs-fuse .host:/ /mnt/hgfs -o allow_other
-   ```
-
-### Every time you rebuild
+So the day-to-day loop is just:
 
 ```bash
 ./gradlew build
-cp build/libs/sifter-0.1.0.jar /mnt/hgfs/mcmods/
 ```
 
-(Once this is working we can wire up a small Gradle task that copies the
-jar automatically after every build, if it gets tedious.)
+Build, test, and deploy, in one command. If `/mnt/hgfs/mods` ever isn't
+mounted (e.g. the VM started before VMware Tools came up), the build
+still succeeds — `copyToMinecraft` prints a warning and skips itself
+rather than failing.
 
-**If shared folders turn out to be awkward** (some VMware/host
-combinations are finicky), the fallback is just: build here, then drag
-the jar across using whatever file-transfer your VMware setup offers
-(shared clipboard file copy, a synced folder like OneDrive/Dropbox
-pointed at the mods folder, or a USB-drive-style transfer). Say the word
-if `/mnt/hgfs` doesn't cooperate and we'll sort out an alternative.
+If shared folders ever stop cooperating, the fallback is dragging the
+jar across manually from `build/libs/` using whatever file-transfer your
+VMware setup offers (shared clipboard file copy, a synced folder like
+OneDrive/Dropbox, etc).
 
 ## 6. First run checklist
 

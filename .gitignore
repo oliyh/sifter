@@ -5,6 +5,7 @@ out/
 
 # Loom / Minecraft dev files
 run/
+logs/
 
 # IDEs
 .idea/

@@ -15,6 +15,12 @@ program along the way. Written for a first-time programmer, working in
 - Every phase has parts marked **You type this** — those are yours. Parts
   marked **We read this together** are where I'll explain what existing
   code does before we change it.
+- This file (`LESSON_PLAN.md`) is the thing worth printing and reading
+  away from the keyboard — the goal, the concepts, the "why". The actual
+  code to type lives in its own file per phase, under `lessons/` (e.g.
+  `lessons/phase-1-the-sifter-exists.md`), linked from each phase's
+  **You type this** below. Keeping them separate means the printed plan
+  stays readable, and the code file stays copy-paste-able.
 - Each phase is broken into short sessions (20-40 minutes). Don't feel you
   need to finish a whole phase in one sitting.
 - **Testing is part of the cycle, not a separate topic.** From the
@@ -47,6 +53,8 @@ program along the way. Written for a first-time programmer, working in
 **What we built:** `Sifter implements ModInitializer` with one method,
 `onInitialize()`, that logs `"Sifter mod loaded!"`.
 
+**You type this:** [`lessons/phase-0-hello-sifter.md`](lessons/phase-0-hello-sifter.md)
+
 **Checkpoint:** build the mod (`SETUP.md`), put it in Minecraft's mods
 folder, launch the game, and check:
 1. The **Mods** button on the main menu lists "Sifter".
@@ -73,6 +81,8 @@ chat* — no log-file digging required.
 
 **What we'll build:** register a callback on the "a player joined" event
 that sends a chat message to that player.
+
+**You type this:** [`lessons/phase-0.5-say-hello-in-chat.md`](lessons/phase-0.5-say-hello-in-chat.md)
 
 **Checkpoint:** join your world, see the Sifter's message appear in chat.
 
@@ -112,12 +122,13 @@ overkill — we shouldn't need to start a whole game just to check that
 **What we built:** `MathWarmup.add(int, int)` — plain Java, nothing to do
 with Minecraft — and `MathWarmupTest`, which checks `add(2, 3) == 5`.
 
-**You type this:**
-1. Run the test suite: `./gradlew test`. It should pass (green).
-2. Break it on purpose — change the test's expected number to something
+**You type this:** [`lessons/interlude-writing-tests.md`](lessons/interlude-writing-tests.md)
+1. Create the two files from the lesson (the class, and its test).
+2. Run the test suite: `./gradlew test`. It should pass (green).
+3. Break it on purpose — change the test's expected number to something
    wrong — and run `./gradlew test` again. Read the failure message.
    That's red.
-3. Fix it back, run again, watch it go green.
+4. Fix it back, run again, watch it go green.
 
 **Checkpoint:** you've seen a test fail *and* pass, and you know the one
 command (`./gradlew test`) that runs every test in the project.
@@ -150,6 +161,8 @@ extremely simple-looking (a placeholder box or two) — the point is that
 **What we'll build:** `SifterEntity` class, register it, give it a
 temporary yellow-colored model (a resized/recolored vanilla mob is fine
 to start).
+
+**You type this:** [`lessons/phase-1-the-sifter-exists.md`](lessons/phase-1-the-sifter-exists.md)
 
 **Checkpoint:** spawn a Sifter with a command and see a yellow mob appear.
 
@@ -188,6 +201,8 @@ write the actual wave maths as its own small pure method, e.g.
 call it — rather than burying the maths inside `tick()` where it can't be
 tested without a running game.
 
+**You type this:** [`lessons/phase-2-wavy-dance.md`](lessons/phase-2-wavy-dance.md)
+
 **Checkpoint:** watch a Sifter wobble/sway as it moves, distinct from
 every other mob.
 
@@ -217,6 +232,8 @@ texture — the "real" yellow Sifter design.
 
 **What we'll build:** a `SifterModel` (client-only) and matching texture,
 wired up through a `SifterRenderer`.
+
+**You type this:** [`lessons/phase-3-give-it-a-real-look.md`](lessons/phase-3-give-it-a-real-look.md)
 
 **Checkpoint:** the Sifter looks like an actual designed creature, not a
 recolored box.
@@ -256,6 +273,8 @@ range)` — fed with a plain list of made-up coordinates, no real world
 needed. The `MineSkulkGoal` itself (which touches the live world) stays
 untested by JUnit and gets checked by playing.
 
+**You type this:** [`lessons/phase-4-mining-skulk.md`](lessons/phase-4-mining-skulk.md)
+
 **Checkpoint:** place skulk near a Sifter and watch it get mined.
 
 **Testing:** write `SkulkFinderTest` with a handful of made-up block
@@ -266,7 +285,46 @@ to try it).
 
 ---
 
-## Phase 5 — Trading with the player
+## Phase 5 — Sifter homes
+
+**Goal:** left to its own devices, a Sifter builds itself a tiny home: a
+blue bed, a crafting table at the foot of the bed, and a furnace with a
+potted spruce sapling on top.
+
+**Concepts introduced:**
+- **Data as a blueprint** — instead of writing five separate
+  "place this block here" instructions scattered through the code, we
+  describe the whole home as one small list of positions-and-parts
+  (a `HomeLayout`) that the building code just reads and follows. This is
+  the same "pull the data out, away from the logic that acts on it" idea
+  from Phase 4's `SkulkFinder`, applied to something we build instead of
+  something we search for.
+- **Records** — a compact way to bundle a few related values into one
+  named thing, e.g. "this position, with this block". We'll meet these
+  properly here.
+- **One-shot goals** — not every goal repeats forever; this one does its
+  job once and then never asks to run again, which is itself a useful
+  pattern (contrast with Phase 2's dance, which runs on every single
+  frame).
+
+**What we'll build:** `HomeLayout` (the plain-coordinates blueprint,
+testable the same way `SkulkFinder` was) and `BuildHomeGoal` (the goal
+that turns those coordinates into real blocks the first chance it gets).
+
+**You type this:** [`lessons/phase-5-sifter-homes.md`](lessons/phase-5-sifter-homes.md)
+
+**Checkpoint:** spawn a Sifter in an open area and watch a little home
+appear around it: bed, crafting table, furnace, potted sapling on top.
+
+**Testing:** `HomeLayoutTest` checks the shape itself — the two bed
+blocks are adjacent, nothing overlaps, the sapling sits exactly above the
+furnace — all without a world in sight. `BuildHomeGoal`, which actually
+edits the world, goes back to being checked by playing, same as
+`MineSkulkGoal` before it.
+
+---
+
+## Phase 6 — Trading with the player
 
 **Goal:** right-click the Sifter to trade, like a villager.
 
@@ -291,6 +349,8 @@ does this Sifter offer" is another pure-ish piece we can separate out
 (e.g. `TradeOffers.choose(Random random, List<TradeOption> options)`) and
 test with a fixed/seeded `Random` so the result is predictable.
 
+**You type this:** [`lessons/phase-6-trading.md`](lessons/phase-6-trading.md)
+
 **Checkpoint:** trade with a Sifter and receive an item back.
 
 **Testing:** write a test that checks the trade-choosing logic never
@@ -303,11 +363,12 @@ extra chore.
 
 ---
 
-## Where to go after Phase 5
+## Where to go after Phase 6
 
 Ideas to pick from once the core mod works, roughly in order of
 difficulty: sounds, particle effects while dancing, a spawn egg, a
-custom advancement, loot drops, a second growth stage/variant.
+custom advancement, loot drops, a second growth stage/variant, a home
+that checks the ground is clear before building.
 
 ---
 
@@ -338,3 +399,4 @@ custom advancement, loot drops, a second growth stage/variant.
 | Assertion | One check inside a test, e.g. "I expect this to equal that" |
 | Red / green | Failing / passing — the two states a test can be in |
 | Pure function | Code whose answer depends only on its inputs, nothing else |
+| Record | A compact way to bundle a few named values into one thing |

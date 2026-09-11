@@ -56,6 +56,30 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.release = 21
 }
 
+// Copies the built mod jar into the Windows mods folder, reached through
+// the VMware shared-folder mount at /mnt/hgfs/mods. Runs automatically
+// after every "./gradlew build". If the mount isn't there (VMware shared
+// folders not set up, or not mounted yet), this just skips itself with a
+// warning instead of failing the whole build.
+def windowsModsDir = file('/mnt/hgfs/mods')
+
+tasks.register('copyToMinecraft', Copy) {
+	group = 'sifter'
+	description = 'Copies the built mod jar into the Windows mods folder.'
+	dependsOn remapJar
+	from remapJar.archiveFile
+	into windowsModsDir
+	onlyIf {
+		def exists = windowsModsDir.exists()
+		if (!exists) {
+			logger.warn("copyToMinecraft: ${windowsModsDir} not found - is the shared folder mounted? Skipping copy.")
+		}
+		return exists
+	}
+}
+
+build.finalizedBy(tasks.named('copyToMinecraft'))
+
 java {
 	sourceCompatibility = JavaVersion.VERSION_21
 	targetCompatibility = JavaVersion.VERSION_21
