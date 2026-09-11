@@ -1,0 +1,23 @@
+{
+	"schemaVersion": 1,
+	"id": "sifter",
+	"version": "${version}",
+	"name": "Sifter",
+	"description": "Adds the Sifter, a yellow mob that mines skulk and trades with the player.",
+	"authors": [
+		"You!"
+	],
+	"license": "CC0-1.0",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.sifter.Sifter"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
