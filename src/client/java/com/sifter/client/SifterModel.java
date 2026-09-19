@@ -42,11 +42,11 @@ public class SifterModel extends EntityModel<SifterEntity> {
 		PartDefinition root = mesh.getRoot();
 
 		root.addOrReplaceChild("bottom",
-			CubeListBuilder.create().texOffs(0, 0).addBox(-8.0F, -16.0F, -8.0F, 16.0F, 16.0F, 16.0F),
+			CubeListBuilder.create().texOffs(0, 0).addBox(-8.0F, -16.0F, -2.4F, 16.0F, 16.0F, 4.8F),
 			PartPose.offset(0.0F, 24.0F, 0.0F));
 
 		root.addOrReplaceChild("top",
-			CubeListBuilder.create().texOffs(0, 32).addBox(-8.0F, -16.0F, -8.0F, 16.0F, 16.0F, 16.0F),
+			CubeListBuilder.create().texOffs(0, 32).addBox(-8.0F, -16.0F, -2.4F, 16.0F, 16.0F, 4.8F),
 			PartPose.offset(0.0F, 8.0F, 0.0F));
 
 		return LayerDefinition.create(mesh, 64, 64);
