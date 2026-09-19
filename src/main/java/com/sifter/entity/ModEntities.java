@@ -17,7 +17,7 @@ public class ModEntities {
 		BuiltInRegistries.ENTITY_TYPE,
 		ResourceLocation.fromNamespaceAndPath(Sifter.MOD_ID, "sifter"),
 		EntityType.Builder.of(SifterEntity::new, MobCategory.CREATURE)
-			.sized(0.9F, 1.3F)
+			.sized(0.8F, 1.7F)
 			.build("sifter")
 	);
 }

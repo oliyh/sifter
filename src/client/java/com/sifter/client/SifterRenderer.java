@@ -14,12 +14,12 @@ import com.sifter.entity.SifterEntity;
 
 // Placeholder look for Phase 1: borrow the vanilla pig's shape, but tint
 // every pixel yellow. We'll design the Sifter's real look in Phase 3.
-public class SifterRenderer extends MobRenderer<SifterEntity, PigModel<SifterEntity>> {
+public class SifterRenderer extends MobRenderer<SifterEntity, SifterModel> {
 
 	private static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace("textures/entity/pig/pig.png");
 
 	public SifterRenderer(EntityRendererProvider.Context context) {
-		super(context, new PigModel<>(context.bakeLayer(ModelLayers.PIG)), 0.5F);
+		super(context, new SifterModel(context.bakeLayer(SifterModel.LAYER)), 0.5F);
 	}
 
 	@Override
