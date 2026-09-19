@@ -176,62 +176,69 @@ question to keep asking each phase is "pure logic, or wiring?")
 
 ## Phase 2 — The wavy dance
 
-**Goal:** the Sifter moves in a distinctive wavy, dance-like way instead
-of walking in a straight line like every other mob.
+**Goal:** the Sifter walks in a straight line, same as any other mob, but
+its two-block body undulates side to side as it moves — the top block
+swaying slightly out of step with the bottom, like a wave travelling up
+its body, instead of the whole thing wobbling as one rigid piece.
 
 **Concepts introduced:**
-- **The game loop / "tick"** — Minecraft calls our entity's `tick()`
-  method roughly 20 times per second, forever, while it exists. This is
-  our first real encounter with a program that *repeats* — a loop we don't
-  even have to write ourselves, because the game engine is already doing
-  it for us.
-- **Variables** — a named box that holds a value that *can* change over
-  time (unlike a constant). We'll keep a variable that tracks "how far
-  through the dance are we."
-- **If statements** — "do this, but only when some condition is true."
-  E.g. *if* the Sifter is on the ground, wobble; otherwise don't.
 - **Basic math on a wave** — using `Math.sin(...)` to turn "time passing"
-  into a smooth up-and-down number, without needing to know trigonometry —
+  into a smooth side-to-side number, without needing to know trigonometry —
   just "this function gives you a wiggly number between -1 and 1."
+- **Phase** — the same wave, started at a different point in its cycle.
+  Two things swaying with the same speed and size but a different phase
+  drift in and out of step with each other, which is exactly how the top
+  and bottom blocks get their "chasing" look from a single shared formula.
+- **Model parts** — pulled forward a little from Phase 3: a custom model
+  is built from independent pieces (`ModelPart`s) that can each be
+  positioned separately. The Sifter's two blocks need to be separate
+  parts *before* they can move independently, so we build a deliberately
+  crude two-box model here — Phase 3 reshapes it into the real design
+  without touching this phase's code.
+- **The game loop, automatically** — once each block is a model part,
+  Minecraft calls our animation code itself, every frame, with no need to
+  hook into `tick()` or juggle the renderer's `PoseStack` by hand.
 
-**What we'll build:** override the Sifter's movement/tick behaviour so its
-position or body rotation follows a sine wave over time. Crucially, we'll
-write the actual wave maths as its own small pure method, e.g.
-`SifterAnimation.wobbleOffset(int ticksAlive)`, and have `tick()` just
-call it — rather than burying the maths inside `tick()` where it can't be
-tested without a running game.
+**What we'll build:** `SifterAnimation.wobbleOffset(ticksAlive, period,
+amplitude, phase)` — a small pure method, tested on its own, with nothing
+to do with Minecraft — plus a minimal `SifterModel` with two `ModelPart`s
+("top" and "bottom") whose `setupAnim()` calls that method twice, once per
+block, with the same period and amplitude but different phases.
 
 **You type this:** [`lessons/phase-2-wavy-dance.md`](lessons/phase-2-wavy-dance.md)
 
-**Checkpoint:** watch a Sifter wobble/sway as it moves, distinct from
-every other mob.
+**Checkpoint:** watch a Sifter walk in a straight line while its body
+undulates, distinct from every other mob.
 
 **Testing:** this is our first *real* unit test on mod code. Write
 `SifterAnimationTest` and check things like: the offset at tick 0 is 0;
 the offset never goes outside the range you designed (e.g. -1 to 1); the
-wave repeats after however many ticks you chose for one cycle. None of
+wave repeats after however many ticks you chose for one cycle; a phase
+shift is equivalent to starting further along the same wave. None of
 these need Minecraft running — that's the win.
 
 ---
 
 ## Phase 3 — Give it a real look
 
-**Goal:** replace the placeholder box with an actual custom model and
-texture — the "real" yellow Sifter design.
+**Goal:** replace the two crude placeholder boxes from Phase 2 with an
+actual designed shape and texture — the "real" yellow Sifter look. The
+`SifterModel` class, its two-part skeleton, and the undulation animation
+from Phase 2 all stay exactly as they are; only the boxes each part draws
+change.
 
 **Concepts introduced:**
-- **Client vs. server code** — Minecraft mods split into code that runs
-  everywhere (server: rules, health, AI) and code that only runs on the
-  screen doing the drawing (client: models, textures, animations). This
-  is why our project already has a `src/client` folder.
-  This is a good point to introduce the idea of **separation of
-  concerns** — keeping "what happens" separate from "how it looks."
-- **Coordinates in 3D** — model parts are built from boxes positioned with
-  x/y/z numbers, an early hands-on use of coordinate geometry.
+- **Coordinates in 3D** — reshaping the existing boxes (and adding more,
+  if we want) means positioning them with x/y/z numbers, an early
+  hands-on use of coordinate geometry.
+- **Separation of concerns** — Phase 2 already split "what the model is
+  made of" from "how it moves"; this phase is the payoff, since we can
+  redesign the shape without touching the animation code at all.
 - **Parameters with defaults / overloading** (as needed, kept light).
 
-**What we'll build:** a `SifterModel` (client-only) and matching texture,
-wired up through a `SifterRenderer`.
+**What we'll build:** a reshaped `SifterModel` body (more/better-shaped
+boxes per part) and a real texture, still wired up through the existing
+`SifterRenderer`.
 
 **You type this:** [`lessons/phase-3-give-it-a-real-look.md`](lessons/phase-3-give-it-a-real-look.md)
 
@@ -400,3 +407,5 @@ that checks the ground is clear before building.
 | Red / green | Failing / passing — the two states a test can be in |
 | Pure function | Code whose answer depends only on its inputs, nothing else |
 | Record | A compact way to bundle a few named values into one thing |
+| Model part | One independently-positionable piece of a custom entity model |
+| Phase | Where in its repeating cycle a wave starts - lets two waves with the same shape drift in and out of step |
