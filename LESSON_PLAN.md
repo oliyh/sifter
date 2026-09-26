@@ -253,38 +253,38 @@ go back to playing and looking for this checkpoint.
 
 ---
 
-## Phase 4 — Mining skulk
+## Phase 4 — Mining sculk
 
-**Goal:** the Sifter notices nearby skulk blocks and mines them.
+**Goal:** the Sifter notices nearby sculk blocks and mines them.
 
 **Concepts introduced:**
 - **Loops we write ourselves** (`for` loops) — scanning every block
-  position in a cube around the Sifter to find skulk. This is the natural
+  position in a cube around the Sifter to find sculk. This is the natural
   moment to explicitly teach `for` loops, having already *felt* an
   implicit loop back in Phase 2.
-- **Lists/arrays** — collecting "all the skulk blocks I found nearby"
+- **Lists/arrays** — collecting "all the sculk blocks I found nearby"
   before deciding what to do about them.
-- **Booleans** — a true/false value, e.g. `isNearSkulk`.
+- **Booleans** — a true/false value, e.g. `isNearsculk`.
 - **AI Goals** — Minecraft mobs pick their next action from a prioritised
-  list of "goals" (wander, follow, attack, ...). We add a `MineSkulkGoal`
+  list of "goals" (wander, follow, attack, ...). We add a `MinesculkGoal`
   the Sifter checks each tick: combines everything above — if statements,
   loops, and booleans — into one real behaviour.
 - **State** — the idea that a mob needs to *remember* what it's currently
   doing (e.g. "mid-mining a block") between ticks, using a variable.
 
-**What we'll build:** a goal that finds the nearest skulk block within
+**What we'll build:** a goal that finds the nearest sculk block within
 range and breaks it over time. Same trick as Phase 2: the "which block is
 nearest" search is a pure method we can write and test on its own — e.g.
-`SkulkFinder.nearest(BlockPos origin, List<BlockPos> candidates, int
+`sculkFinder.nearest(BlockPos origin, List<BlockPos> candidates, int
 range)` — fed with a plain list of made-up coordinates, no real world
-needed. The `MineSkulkGoal` itself (which touches the live world) stays
+needed. The `MinesculkGoal` itself (which touches the live world) stays
 untested by JUnit and gets checked by playing.
 
-**You type this:** [`lessons/phase-4-mining-skulk.md`](lessons/phase-4-mining-skulk.md)
+**You type this:** [`lessons/phase-4-mining-sculk.md`](lessons/phase-4-mining-sculk.md)
 
-**Checkpoint:** place skulk near a Sifter and watch it get mined.
+**Checkpoint:** place sculk near a Sifter and watch it get mined.
 
-**Testing:** write `SkulkFinderTest` with a handful of made-up block
+**Testing:** write `sculkFinderTest` with a handful of made-up block
 lists: nearest block picked correctly, blocks outside `range` ignored,
 an empty list handled without crashing (this last one is a classic case
 a test catches that manual play easily misses — you'd have to remember
@@ -304,7 +304,7 @@ potted spruce sapling on top.
   describe the whole home as one small list of positions-and-parts
   (a `HomeLayout`) that the building code just reads and follows. This is
   the same "pull the data out, away from the logic that acts on it" idea
-  from Phase 4's `SkulkFinder`, applied to something we build instead of
+  from Phase 4's `sculkFinder`, applied to something we build instead of
   something we search for.
 - **Records** — a compact way to bundle a few related values into one
   named thing, e.g. "this position, with this block". We'll meet these
@@ -315,7 +315,7 @@ potted spruce sapling on top.
   frame).
 
 **What we'll build:** `HomeLayout` (the plain-coordinates blueprint,
-testable the same way `SkulkFinder` was) and `BuildHomeGoal` (the goal
+testable the same way `sculkFinder` was) and `BuildHomeGoal` (the goal
 that turns those coordinates into real blocks the first chance it gets).
 
 **You type this:** [`lessons/phase-5-sifter-homes.md`](lessons/phase-5-sifter-homes.md)
@@ -327,7 +327,7 @@ appear around it: bed, crafting table, furnace, potted sapling on top.
 blocks are adjacent, nothing overlaps, the sapling sits exactly above the
 furnace — all without a world in sight. `BuildHomeGoal`, which actually
 edits the world, goes back to being checked by playing, same as
-`MineSkulkGoal` before it.
+`MinesculkGoal` before it.
 
 ---
 
@@ -350,7 +350,7 @@ edits the world, goes back to being checked by playing, same as
   an **if statement** (e.g. only trade if the player is holding the right
   item).
 
-**What we'll build:** trade offers involving skulk-related or
+**What we'll build:** trade offers involving sculk-related or
 sculk-themed items, opened on right-click. The choice of "which trade(s)
 does this Sifter offer" is another pure-ish piece we can separate out
 (e.g. `TradeOffers.choose(Random random, List<TradeOption> options)`) and
