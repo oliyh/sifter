@@ -46,8 +46,8 @@ public class SifterModel extends EntityModel<SifterEntity> {
 			PartPose.offset(0.0F, 24.0F, 0.0F));
 
 		root.addOrReplaceChild("top",
-			CubeListBuilder.create().texOffs(0, 32).addBox(-8.0F, -16.0F, -2.4F, 16.0F, 16.0F, 4.8F),
-			PartPose.offset(0.0F, 8.0F, 0.0F));
+			CubeListBuilder.create().texOffs(0, 32).addBox(-6.0F, -12.0F, -2.4F, 16.0F, 16.0F, 4.8F),
+			PartPose.offset(0.0F, 10.0F, 0.0F));
 
 		return LayerDefinition.create(mesh, 64, 64);
 	}
