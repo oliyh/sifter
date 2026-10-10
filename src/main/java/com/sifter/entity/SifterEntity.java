@@ -33,8 +33,9 @@ public class SifterEntity extends PathfinderMob {
 	@Override
 	protected void registerGoals() {
 		this.goalSelector.addGoal(0, new FloatGoal(this));
-		this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 5.0F));
-		this.goalSelector.addGoal(2, new RandomLookAroundGoal(this));
+		this.goalSelector.addGoal(1, new MineSculkGoal(this, 1.0, 30));
+		this.goalSelector.addGoal(2, new LookAtPlayerGoal(this, Player.class, 5.0F));
+		this.goalSelector.addGoal(3, new RandomLookAroundGoal(this));
 	}
 
 }
