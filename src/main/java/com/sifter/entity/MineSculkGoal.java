@@ -5,6 +5,7 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MoveToBlockGoal;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 // This class talks directly to the live world (level, blockPos), so
 // unlike SkulkFinder it isn't something we unit test - we check it by
@@ -23,13 +24,25 @@ public class MineSculkGoal extends MoveToBlockGoal {
 
 	@Override
 	protected boolean isValidTarget(LevelReader level, BlockPos pos) {
-		return level.getBlockState(pos).is(Blocks.SCULK);
+		BlockState currentBlockState = level.getBlockState(pos);
+		return currentBlockState.is(Blocks.SCULK) || currentBlockState.is(Blocks.SCULK_VEIN) || currentBlockState.is(Blocks.SCULK_CATALYST);
 	}
 
 	@Override
 	protected int nextStartTick(PathfinderMob pathfinderMob) {
       return 30;
    	}
+
+	// The goal normally walks the mob to the block above the target, which
+	// suits full blocks. A vein has no collision, so the sifter ends up
+	// standing inside the vein's own cell - aim for that instead.
+	@Override
+	protected BlockPos getMoveToTarget() {
+		if (mob.level().getBlockState(blockPos).is(Blocks.SCULK_VEIN)) {
+			return blockPos;
+		}
+		return super.getMoveToTarget();
+	}
 
 	@Override
 	public void tick() {
@@ -42,7 +55,7 @@ public class MineSculkGoal extends MoveToBlockGoal {
 
 		mining++;
 		if (mining >= MINE_TICKS) {
-			mob.level().removeBlock(blockPos, false);
+			mob.level().destroyBlock(blockPos, false, mob);
 			mining = 0;
 		}
 	}

@@ -1,5 +1,6 @@
 package com.sifter.entity;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -17,6 +18,31 @@ public class SifterEntity extends PathfinderMob {
 	// SifterEntity(...)" directly.
     public SifterEntity(EntityType<? extends SifterEntity> type, Level level) {
 		super(type, level);
+	}
+
+    // Whether this Sifter has built its home yet. Lives on the entity (not
+	// the goal) because goals are recreated on load, but the entity's saved
+	// data survives.
+	private boolean homeBuilt;
+
+	public boolean hasBuiltHome() {
+		return homeBuilt;
+	}
+
+	public void setHomeBuilt(boolean homeBuilt) {
+		this.homeBuilt = homeBuilt;
+	}
+
+	@Override
+	public void addAdditionalSaveData(CompoundTag tag) {
+		super.addAdditionalSaveData(tag);
+		tag.putBoolean("HomeBuilt", homeBuilt);
+	}
+
+	@Override
+	public void readAdditionalSaveData(CompoundTag tag) {
+		super.readAdditionalSaveData(tag);
+		homeBuilt = tag.getBoolean("HomeBuilt");
 	}
 
     // Every mob type must declare its starting stats. 20 health = 10 hearts,

@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.state.properties.BedPart;
 public class BuildHomeGoal extends Goal {
 
 	private final SifterEntity sifter;
-	private boolean built;
 
 	public BuildHomeGoal(SifterEntity sifter) {
 		this.sifter = sifter;
@@ -23,7 +22,7 @@ public class BuildHomeGoal extends Goal {
 
 	@Override
 	public boolean canUse() {
-		return !built;
+		return !sifter.hasBuiltHome();
 	}
 
 	@Override
@@ -45,6 +44,6 @@ public class BuildHomeGoal extends Goal {
 		level.setBlockAndUpdate(anchor.offset(HomeLayout.FURNACE), Blocks.FURNACE.defaultBlockState());
 		level.setBlockAndUpdate(anchor.offset(HomeLayout.POTTED_SAPLING), Blocks.POTTED_SPRUCE_SAPLING.defaultBlockState());
 
-		built = true;
+		sifter.setHomeBuilt(true);
 	}
 }
