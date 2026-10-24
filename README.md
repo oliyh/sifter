@@ -8,6 +8,7 @@ This is a learning project. See:
 - [`LESSON_PLAN.md`](LESSON_PLAN.md) — the phase-by-phase curriculum we're following (the part worth printing).
 - [`lessons/`](lessons/) — one file per phase with the actual code to type, linked from each phase's **You type this**.
 - [`SETUP.md`](SETUP.md) — how to build the mod and load it into Minecraft on Windows.
+- [`INSTALL.md`](INSTALL.md) — download a prebuilt jar from GitHub and install it manually.
 
 ## Quick reference
 
