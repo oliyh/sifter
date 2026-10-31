@@ -370,10 +370,220 @@ extra chore.
 
 ---
 
-## Where to go after Phase 6
+## Phase 7 — A spawn egg
+
+**Goal:** a "Sifter Spawn Egg" in the creative inventory. Use it on a
+block and a Sifter appears.
+
+**Concepts introduced:**
+- **Items** — a second registry, next to the entity one from Phase 1.
+  Same idea (nothing exists until it's registered), different phone book.
+- **Hexadecimal colours** — writing a colour as `0xRRGGBB`, so we can
+  choose the egg's two colours.
+- **Resource files (JSON)** — not everything in a mod is Java. How an
+  item looks and what it's called live in small text files.
+- **Translation keys** — code asks for `item.sifter.sifter_spawn_egg`,
+  and a language file turns that into words. It also finally gives the
+  Sifter itself a proper name.
+- **Reading a file in a test** — a test can check files, not just code.
+
+**What we'll build:** `ModItems` (registers a `SpawnEggItem` that spawns
+Sifters, and puts it in the creative Spawn Eggs tab), a model file, an
+`en_us.json` with the names.
+
+**You type this:** [`lessons/phase-7-spawn-egg.md`](lessons/phase-7-spawn-egg.md)
+
+**Checkpoint:** find the egg in the creative inventory, use it on a
+block, get a Sifter.
+
+**Testing:** mostly wiring, so mostly checked by playing — except one
+useful thing: `LangFileTest` reads `en_us.json` and checks every name we
+need is in it, so a typo shows up as a red test instead of ugly text in
+game.
+
+---
+
+## Phase 8 — Wardens attack Sifters
+
+**Goal:** a Warden near a Sifter notices it and attacks it.
+
+**Concepts introduced:**
+- **The remainder operator (`%`)** — "what's left over after dividing".
+  Because the answer is 0 exactly once every N steps, it's how you say
+  "do this every N ticks".
+- **Ticks** — Minecraft's heartbeat, 20 a second, and the counter every
+  entity keeps.
+- **Server vs client** — the half of the game that decides what happens
+  versus the half that draws it, and why mob behaviour only runs on the
+  first.
+- **Searching an area for other objects** — a bounding box (`AABB`) and
+  `getEntitiesOfClass`, which hands back a list we can walk with a `for`
+  loop.
+
+**What we'll build:** `TickTimer.isDue(tick, interval)` (pure), and a
+once-a-second job in `SifterEntity` that finds Wardens within 24 blocks
+and raises their anger at the Sifter. (Wardens don't use goals like other
+mobs, so we nudge their existing anger list rather than adding a goal.)
+
+**You type this:** [`lessons/phase-8-wardens-attack-sifters.md`](lessons/phase-8-wardens-attack-sifters.md)
+
+**Checkpoint:** put a Warden and a Sifter near each other; the Warden
+turns on the Sifter.
+
+**Testing:** `TickTimerTest` — due on tick 0, 20, 40; not due in
+between; an interval of 1 is due every tick. The world-touching part
+(finding Wardens, angering them) is checked by playing.
+
+---
+
+## Phase 9 — Sifters spawn in ancient cities
+
+**Goal:** Sifters appear on their own in the Deep Dark, where ancient
+cities generate.
+
+**Concepts introduced:**
+- **Spawn lists and weights** — how Minecraft chooses what spawns in a
+  biome: a weighted bag of mobs, like marbles in a bag.
+- **Exceptions and validation** — refusing nonsense (a weight of 0, a
+  group of "4 to 2") loudly and immediately, with `throw`, instead of
+  letting it become a mystery bug later.
+- **Testing that something fails** — `assertThrows`, the other half of
+  testing: bad input must be rejected.
+- **Overriding a yes/no question** — telling Minecraft a naturally spawned
+  Sifter should never despawn when you walk away.
+
+**What we'll build:** `SpawnRule` (a record that validates its own
+numbers), `ModSpawns` (adds the rule to the Deep Dark biome using Fabric's
+biome API), and `removeWhenFarAway` on the Sifter.
+
+**You type this:** [`lessons/phase-9-spawn-in-ancient-cities.md`](lessons/phase-9-spawn-in-ancient-cities.md)
+
+**Checkpoint:** explore an ancient city; Sifters turn up.
+
+**Testing:** `SpawnRuleTest` — a sensible rule is accepted; weight 0, an
+empty group, and a maximum smaller than the minimum are each rejected.
+Whether Minecraft then really spawns them is checked by exploring.
+
+---
+
+## Phase 10 — Abandoned homes
+
+**Goal:** when a Sifter can't find sculk nearby, it walks back to its
+home, and the home becomes abandoned: no bed, no plant in the pot.
+
+**Concepts introduced:**
+- **Enums** — a type with a short fixed list of values we write
+  ourselves (`NO_HOME`, `LIVED_IN`, `ABANDONED`), instead of a pair of
+  booleans.
+- **`switch`** — the tidy way to do something different for each enum
+  value.
+- **State machines** — "always in exactly one state, plus rules for moving
+  between states", written as a pure function so every rule can be tested.
+- **`null`** — "nothing here", why asking it for anything crashes, and
+  checking before you use it.
+- **Caching** — doing an expensive check (scanning for sculk) rarely and
+  remembering the answer.
+- **Saving and loading** — keeping the home's status and position when the
+  world closes, and still loading old worlds.
+
+**What we'll build:** `HomeStatus`, `HomeLifecycle.next(...)`,
+`SculkBlocks` (the shared "is it sculk / is any nearby" questions),
+`GoHomeGoal`, and `AbandonedHome`, which takes the bed and sapling away.
+`SifterEntity` swaps its `homeBuilt` flag for a status and a home position.
+
+**You type this:** [`lessons/phase-10-abandoned-homes.md`](lessons/phase-10-abandoned-homes.md)
+
+**Checkpoint:** build a home beside some sculk, then remove the sculk. The
+Sifter walks home and the bed and sapling vanish.
+
+**Testing:** `HomeLifecycleTest` covers every row of the rules (six small
+tests); `HomeLayoutTest` gains two checks that the bed positions are the
+right ones. Looking for sculk and changing blocks touches the world, so
+those are checked by playing.
+
+---
+
+## Phase 11 — Sifter guardians
+
+**Goal:** a big, glowing, blue, sculk-ish blaze-shaped protector that
+guards Sifters the way Iron Golems guard villages.
+
+Yes, there's an iron golem class to build on: `IronGolem`. Extending it
+gives us the punch, health, knockback resistance, cracks and iron-ingot
+repair without writing any of it. We replace only whom it defends and
+how it looks.
+
+**Concepts introduced:**
+- **Overriding** — replacing an inherited method (`@Override`), when to
+  keep the parent's version with `super`, and when to deliberately drop
+  it (`IronGolem`'s village behaviour).
+- **Target goals** — the second goal list: `goalSelector` decides *what to
+  do*, `targetSelector` decides *who to go after*.
+- **Separating the dice from the decision** — roll the random number
+  outside, pass it in, and the function becomes fully testable.
+- **Reusing a vanilla model** — the vanilla Blaze model with our own
+  texture and size.
+
+**What we'll build:** `GuardianSpawning.shouldSpawn(roll, chance, nearby)`
+(pure), `SifterGuardianEntity extends IronGolem`, `DefendSiftersGoal`, a
+renderer that reuses the Blaze model with a blue texture, and a 50% chance
+that a guardian turns up when a Sifter builds a home.
+
+**You type this:** [`lessons/phase-11-sifter-guardians.md`](lessons/phase-11-sifter-guardians.md)
+
+**Checkpoint:** a guardian appears beside new homes, punches hostile mobs,
+and comes for anything that hurts a Sifter.
+
+**Testing:** `GuardianSpawningTest` — low roll spawns, high roll doesn't,
+a roll exactly on the chance doesn't (the `<` vs `<=` mistake), chance 0
+never spawns, chance 1 always does unless a guardian is already there.
+`LangFileTest` gains the guardian's name. How it looks and fights is
+checked by playing.
+
+---
+
+## Phase 12 — Sifter migrations
+
+**Goal:** after abandoning its home, a Sifter goes on a long journey: it
+looks for high ground at least 25 blocks above sea level, looks for the
+nearest sculk from up there, walks to it, and settles to build a new home.
+
+The biggest lesson in the plan, but mostly pieces we already have.
+
+**Concepts introduced:**
+- **Angles and directions** — radians, and `Math.cos` / `Math.sin` to turn
+  "heading + distance" into a place (sin again, from Phase 2).
+- **Breaking big jobs into hops** — a mob can only plan a short route, so
+  a long journey is a chain of short ones.
+- **Stages** — a state machine again (Phase 10), this time holding "which
+  step of the journey am I on".
+- **Method references and `stream().map`** — applying one function to
+  every item of a list.
+- **Asking cheap questions about big areas** — asking each 16-block
+  section of the world "is there any sculk in you?" instead of checking
+  every block.
+
+**What we'll build:** `HighGround` and `MigrationPlanner` (pure),
+`SculkScanner`, and `MigrateGoal` with its CLIMB, SCAN and TRAVEL stages,
+reusing `SculkFinder` from Phase 4 to pick the nearest sculk.
+
+**You type this:** [`lessons/phase-12-sifter-migrations.md`](lessons/phase-12-sifter-migrations.md)
+
+**Checkpoint:** an abandoned Sifter sets off, climbs a hill, spots sculk,
+walks there and builds a new home.
+
+**Testing:** `HighGroundTest` (both sides of the 25-block line, picking
+the highest spot, empty list), `MigrationPlannerTest` (headings point the
+right way, rings have the right size, hops are the right length, repeated
+hops arrive). `MigrateGoal` walks around a live world, so it's checked by
+playing; the lesson is upfront about the limits.
+
+---
+
+## Where to go after Phase 12
 
 Ideas to pick from once the core mod works, roughly in order of
-difficulty: sounds, particle effects while dancing, a spawn egg, a
+difficulty: sounds, particle effects while dancing, a
 custom advancement, loot drops, a second growth stage/variant, a home
 that checks the ground is clear before building.
 
@@ -409,3 +619,16 @@ that checks the ground is clear before building.
 | Record | A compact way to bundle a few named values into one thing |
 | Model part | One independently-positionable piece of a custom entity model |
 | Phase | Where in its repeating cycle a wave starts - lets two waves with the same shape drift in and out of step |
+| Remainder (`%`) | What's left over after dividing; 0 once every N steps |
+| Tick | One 1/20th-of-a-second heartbeat of the game |
+| Server / client | The half of the game that decides what happens / the half that draws it |
+| Override | Replace a method you inherited with your own version |
+| Exception | A deliberate crash with a message, used to refuse nonsense input |
+| Validation | Checking inputs at the door and rejecting bad ones |
+| Enum | A type whose values are a short, fixed list you write yourself |
+| State machine | Always in exactly one state, plus rules for moving between states |
+| Null | "Nothing here" — a variable holding no object; check before using it |
+| Cache | Remember the answer to an expensive question instead of asking again |
+| Radian | A way to measure angles: a full turn is 2 × π |
+| Resource file | A non-Java file (JSON, image) the game loads by name |
+| Translation key | A label like `item.sifter.sifter_spawn_egg` that a language file turns into words |
