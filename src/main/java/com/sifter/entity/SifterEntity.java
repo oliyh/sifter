@@ -21,6 +21,8 @@ import net.minecraft.world.item.trading.Merchant;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SifterEntity extends PathfinderMob implements Npc, Merchant {
     
@@ -175,6 +177,20 @@ public class SifterEntity extends PathfinderMob implements Npc, Merchant {
 	@Override
 	public boolean isClientSide() {
 		return this.level().isClientSide();
+	}
+
+	public void blockMined(BlockState block) {
+		if (!this.offers.isEmpty()) {
+			if (block.is(Blocks.SCULK)) {
+				this.offers.get(0).resetUses();
+			} else if (block.is(Blocks.SCULK_CATALYST)) {
+				this.offers.get(1).resetUses();
+			} else if (block.is(Blocks.SCULK_VEIN)) {
+				this.offers.get(2).resetUses();
+			} else {
+				// not a block that we can trade, so ignore
+			}
+		}
 	}
 
 }

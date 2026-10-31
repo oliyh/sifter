@@ -17,9 +17,11 @@ public class MineSculkGoal extends MoveToBlockGoal {
 	private static final int MINE_TICKS = 60;
 
 	private int mining;
+	private SifterEntity sifter;
 
 	public MineSculkGoal(SifterEntity sifter, double speedModifier, int searchRange) {
 		super(sifter, speedModifier, searchRange);
+		this.sifter = sifter;
 	}
 
 	@Override
@@ -55,6 +57,7 @@ public class MineSculkGoal extends MoveToBlockGoal {
 
 		mining++;
 		if (mining >= MINE_TICKS) {
+			this.sifter.blockMined(mob.level().getBlockState(blockPos));
 			mob.level().destroyBlock(blockPos, false, mob);
 			mining = 0;
 		}

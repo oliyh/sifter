@@ -36,7 +36,7 @@ public class Sifter implements ModInitializer {
 		// joining a world.
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			handler.player.sendSystemMessage(Component.literal("Hello from the Sifters!"));
-			int b = 10;
+			int b = 13;
 			handler.player.sendSystemMessage(Component.literal(String.format("b = %s", b)));
 		});
 	}
