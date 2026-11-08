@@ -8,6 +8,8 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRe
 
 import com.sifter.entity.ModEntities;
 import com.sifter.entity.SifterEntity;
+import com.sifter.item.ModItems;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +32,9 @@ public class Sifter implements ModInitializer {
 		// are. Referencing ModEntities.SIFTER here is also what triggers
 		// its registration (see ModEntities.java).
 		FabricDefaultAttributeRegistry.register(ModEntities.SIFTER, SifterEntity.createAttributes());
+
+		// Tell Minecraft our other mod items (the Sifter Spawn egg) exist
+		ModItems.register();
 
 		// Phase 0.5: register a callback. We don't call this code ourselves -
 		// Minecraft calls it automatically, every time a player finishes
