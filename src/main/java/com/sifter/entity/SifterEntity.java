@@ -23,9 +23,19 @@ import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.monster.warden.Warden;
+import net.minecraft.world.phys.AABB;
+
 
 public class SifterEntity extends PathfinderMob implements Npc, Merchant {
     
+	// Wardens within this many blocks get provoked, once per second, for this
+	// much anger each time. A warden turns "agitated" at 40 anger and
+	// "angry" (starts attacking) at 80, so three pulses is enough.
+	private static final int WARDEN_PROVOKE_RANGE = 24;
+	private static final int WARDEN_PROVOKE_INTERVAL = 20;
+	private static final int WARDEN_PROVOKE_ANGER = 35;
+
     // The constructor: code that runs once, the moment a new Sifter is
 	// created. Minecraft calls this itself - we never call "new
 	// SifterEntity(...)" directly.
@@ -190,6 +200,25 @@ public class SifterEntity extends PathfinderMob implements Npc, Merchant {
 			} else {
 				// not a block that we can trade, so ignore
 			}
+		}
+	}
+
+	@Override
+	protected void customServerAiStep() {
+		super.customServerAiStep();
+
+		if (TickTimer.isDue(this.tickCount, WARDEN_PROVOKE_INTERVAL)) {
+			provokeNearbyWardens();
+		}
+	}
+
+	// Look in a box around us for Wardens, and make each one angrier at us.
+	// Wardens already track anger per target - we're just adding ourselves
+	// to the list of things they're angry at.
+	private void provokeNearbyWardens() {
+		AABB searchBox = this.getBoundingBox().inflate(WARDEN_PROVOKE_RANGE);
+		for (Warden warden : this.level().getEntitiesOfClass(Warden.class, searchBox)) {
+			warden.increaseAngerAt(this, WARDEN_PROVOKE_ANGER, true);
 		}
 	}
 
