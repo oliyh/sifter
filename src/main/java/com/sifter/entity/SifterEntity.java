@@ -222,4 +222,12 @@ public class SifterEntity extends PathfinderMob implements Npc, Merchant {
 		}
 	}
 
+	// Mobs that spawn naturally normally vanish when you wander far away
+	// (that's why you don't find old zombies from hours ago). A Sifter has a
+	// home and a life to get on with, so it should stay put instead.
+	@Override
+	public boolean removeWhenFarAway(double distanceToClosestPlayer) {
+		return false;
+	}
+
 }

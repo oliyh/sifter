@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRe
 import com.sifter.entity.ModEntities;
 import com.sifter.entity.SifterEntity;
 import com.sifter.item.ModItems;
+import com.sifter.spawn.ModSpawns;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +37,15 @@ public class Sifter implements ModInitializer {
 		// Tell Minecraft our other mod items (the Sifter Spawn egg) exist
 		ModItems.register();
 
+		// Tell Minecraft about our spawning behaviour
+		ModSpawns.register();
+
 		// Phase 0.5: register a callback. We don't call this code ourselves -
 		// Minecraft calls it automatically, every time a player finishes
 		// joining a world.
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			handler.player.sendSystemMessage(Component.literal("Hello from the Sifters!"));
-			int b = 13;
+			int b = 14;
 			handler.player.sendSystemMessage(Component.literal(String.format("b = %s", b)));
 		});
 	}
